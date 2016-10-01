@@ -60,8 +60,10 @@ public class PickupParent : MonoBehaviour {
     void OnTriggerStay(Collider col) {
         Debug.Log("You have collided with " + col.name + " and activated OnTriggerStay");
 
-        if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger)) {
-            if ("Interactable".Equals(col.gameObject.tag)) {
+        //if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger)) {
+          if (SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.FarthestLeft))
+              .GetTouch(SteamVR_Controller.ButtonMask.Trigger)) {
+                if ("Interactable".Equals(col.gameObject.tag)) {
                 col.attachedRigidbody.isKinematic = true;
                 col.gameObject.transform.SetParent(gameObject.transform);
             }
