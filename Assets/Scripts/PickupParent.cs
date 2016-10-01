@@ -6,6 +6,12 @@ using System;
 public class PickupParent : MonoBehaviour {
 
     public GameObject prefabSphere;
+    [Header("Haptics")]
+    [Space(5)]
+    public int pulseCount;
+    [Range(0.0f, 5.0f)]
+    public float pulseLength, pauseLength;
+    [Space(10)]
 
     SteamVR_TrackedObject trackedObj;
     SteamVR_Controller.Device device;
@@ -72,7 +78,15 @@ public class PickupParent : MonoBehaviour {
 
     void OnTriggerEnter(Collider col) {
         Debug.Log("You have collided with :" + col.name);
-        StartCoroutine(HapticSinglePulse(2f));
+        //StartCoroutine(HapticSinglePulse(2f));
+        StartCoroutine(HapticPatternPusle(pulseCount, pulseLength, pauseLength));
+    }
+
+    IEnumerator HapticPatternPusle(int pulseCount, float pulseLength, float pauseLength) {
+        for (int i = 0; i < pulseCount; i++) {
+            yield return StartCoroutine(HapticSinglePulse(pulseLength));
+            yield return new WaitForSeconds(pulseLength);
+        }
     }
 
     IEnumerator HapticSinglePulse(float length) {
