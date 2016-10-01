@@ -5,7 +5,7 @@ using System;
 [RequireComponent (typeof(SteamVR_TrackedObject))]
 public class PickupParent : MonoBehaviour {
 
-    public Transform sphere;
+    public GameObject prefabSphere;
 
     SteamVR_TrackedObject trackedObj;
     SteamVR_Controller.Device device;
@@ -44,9 +44,10 @@ public class PickupParent : MonoBehaviour {
 
         if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad)) {
             Debug.Log("you activated PressUp the Touchpad");
-            sphere.transform.position = Vector3.zero;
-            sphere.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            sphere.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            GameObject.Instantiate(prefabSphere);
+            //sphere.transform.position = Vector3.zero;
+            //sphere.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            //sphere.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
         }
     }
 
@@ -54,8 +55,11 @@ public class PickupParent : MonoBehaviour {
         Debug.Log("You have collided with " + col.name + " and activated OnTriggerStay");
 
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Trigger)) {
-            col.attachedRigidbody.isKinematic = true;
-            col.gameObject.transform.SetParent(gameObject.transform); 
+            if ("Interactable".Equals(col.gameObject.tag)) {
+                col.attachedRigidbody.isKinematic = true;
+                col.gameObject.transform.SetParent(gameObject.transform);
+            }
+            
         }
 
         if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Trigger)) {
@@ -63,6 +67,18 @@ public class PickupParent : MonoBehaviour {
             col.attachedRigidbody.isKinematic = false;
 
             tossObject(col.attachedRigidbody);
+        }
+    }
+
+    void OnTriggerEnter(Collider col) {
+        Debug.Log("You have collided with :" + col.name);
+        StartCoroutine(HapticSinglePulse(2f));
+    }
+
+    IEnumerator HapticSinglePulse(float length) {
+        for (float i = 0; i < length; i += Time.deltaTime) {
+            device.TriggerHapticPulse();
+            yield return null;
         }
     }
 
